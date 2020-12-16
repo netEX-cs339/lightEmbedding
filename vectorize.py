@@ -11,7 +11,7 @@ SAVE_PATH = 'Data/bin'
 
 # Load data
 docs = []
-with fopen(osp.join(DATA_PATH, 'sample2000.json')) as f:
+with fopen(osp.join(DATA_PATH, 'sample10000.json')) as f:
     for line in f:
         doc = json.loads(line)
         docs.append(doc)
@@ -25,5 +25,5 @@ X_arr = X.toarray()
 print(np.shape(X_arr))
 
 # Save
-np.save(osp.join(SAVE_PATH, "sample2000_bin.npy"), X_arr)
+np.save(osp.join(SAVE_PATH, "sample10000_bin.npy"), X_arr)
 np.save(osp.join(SAVE_PATH, "dim.npy"), X_arr.shape[1])

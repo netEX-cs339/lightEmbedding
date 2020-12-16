@@ -1,5 +1,4 @@
 import json
-import os
 import pickle
 import os.path as osp
 import numpy as np
@@ -10,7 +9,7 @@ DATA_PATH = 'Data/json'
 SAVE_PATH = 'Data/bin'
 # Load data
 docs = []
-with fopen(osp.join(DATA_PATH, 'sample2000.json')) as f:
+with fopen(osp.join(DATA_PATH, 'sample10000.json')) as f:
     for line in f:
         doc = json.loads(line)
         docs.append(doc)
@@ -67,5 +66,5 @@ X = vectorizer.transform(docs).tocsr()
 with open(osp.join(SAVE_PATH, 'vectorizer.pkl'), 'wb') as f:
     pickle.dump(vectorizer, f)
 
-np.save(osp.join(SAVE_PATH, "sample2000_bin.npy"), X.toarray())
+np.save(osp.join(SAVE_PATH, "sample10000_bin.npy"), X.toarray())
 

@@ -5,7 +5,7 @@ from torch.autograd import Variable
 
 
 class VAE(nn.Module):
-    def __init__(self, input_dim, latent_dim=256, hidden_dim=1024):
+    def __init__(self, input_dim, latent_dim=8, hidden_dim=64, n_samples=10):
         super(VAE, self).__init__()
 
         self.fc_e = nn.Linear(input_dim, hidden_dim, bias=False)
@@ -14,6 +14,7 @@ class VAE(nn.Module):
         self.fc_d1 = nn.Linear(latent_dim, hidden_dim, bias=False)
         self.fc_d2 = nn.Linear(hidden_dim, input_dim, bias=False)
         self.input_dim = input_dim
+        self.n_samples = n_samples
 
     def encoder(self, x_in):
         x = F.relu(self.fc_e(x_in))
@@ -34,8 +35,15 @@ class VAE(nn.Module):
 
     def forward(self, x_in):
         z_mean, z_logvar = self.encoder(x_in)
-        z = self.sample_normal(z_mean, z_logvar)
-        x_out = self.decoder(z)
+
+        for i in range(0, self.n_samples):
+            z = self.sample_normal(z_mean, z_logvar)
+            if i == 0:
+                x_out = self.decoder(z)
+            else:
+                x_out = x_out + self.decoder(z)
+
+        x_out = x_out / self.n_samples
         return x_out, z_mean, z_logvar
 
 

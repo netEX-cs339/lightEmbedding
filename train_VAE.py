@@ -14,10 +14,7 @@ import numpy as np
 import pickle
 
 import torch
-import torch.nn as nn
 import torch.utils.data as data
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
 from torch.autograd import Variable
 
 from tool import update_lr
@@ -28,15 +25,15 @@ from dataset import BinaryDataset
 GPU_ID = 0
 IS_TRAIN = True
 BATCH_SIZE = 32
-EPOCH_NUM = 10
+EPOCH_NUM = 100
 LEARNING_RATE_TYPE = "3"
 SAVE_SET = 'train'  # test
 EPOCH_NUM_CALC = 100
 NET = 'VAE'
 DATA_SET = 'BIN'
-LATENT_DIM = 256
+LATENT_DIM = 8
 
-DATA_ROOT = "D:/grade3/FallSemester/计算机网络/embedding/Data/bin/sample2000"
+DATA_ROOT = "D:/grade3/FallSemester/计算机网络/embedding/Data/bin/sample10000"
 
 
 class NetworkTrainer(object):
@@ -56,11 +53,6 @@ class NetworkTrainer(object):
 
         self.LR_LIST_3 = np.ones(args.num_epochs) * 1e-3  # arg:'3'
         self.LR_LIST_45 = np.logspace(-4, -5, args.num_epochs)  # arg:'45'
-        self.LR_LIST_56 = np.logspace(-5, -6, args.num_epochs)  # arg:'56'
-        self.LR_LIST_23 = np.logspace(-2, -3, args.num_epochs)  # arg:'23'
-        self.LR_LIST_34 = np.logspace(-3, -4, args.num_epochs)  # arg:'34'
-        self.LR_LIST_67 = np.logspace(-6, -7, args.num_epochs)  # arg:'67'
-        self.LR_LIST_89 = np.logspace(-8, -9, args.num_epochs)  # arg:'89'
 
         self.PATH = {}
         self.PATH['fig_save_path'] = PROJECT_ROOT + '/save/figs/'
@@ -91,16 +83,6 @@ class NetworkTrainer(object):
 
         if self.LEARNING_RATE_TYPE == '45':
             self.LEARNING_RATE = self.LR_LIST_45
-        elif self.LEARNING_RATE_TYPE == '67':
-            self.LEARNING_RATE = self.LR_LIST_67
-        elif self.LEARNING_RATE_TYPE == '89':
-            self.LEARNING_RATE = self.LR_LIST_89
-        elif self.LEARNING_RATE_TYPE == '34':
-            self.LEARNING_RATE = self.LR_LIST_34
-        elif self.LEARNING_RATE_TYPE == '23':
-            self.LEARNING_RATE = self.LR_LIST_23
-        elif self.LEARNING_RATE_TYPE == '56':
-            self.LEARNING_RATE = self.LR_LIST_56
         elif self.LEARNING_RATE_TYPE == '3':
             self.LEARNING_RATE = self.LR_LIST_3
 
@@ -149,7 +131,7 @@ class NetworkTrainer(object):
         avg_loss = float(total_loss) / length
 
         self.plot_dict['train_loss'].append(avg_loss)
-        print('ELBO of the network on the training records: {}'.format(avg_loss))
+        print('LOSS of the network on the training records: {}'.format(avg_loss))
         return avg_loss
 
     def eval_epoch(self):
@@ -167,20 +149,26 @@ class NetworkTrainer(object):
         avg_loss = float(total_loss) / length
 
         self.plot_dict['test_loss'].append(avg_loss)
-        print('ELBO of the network on the testing records: {}'.format(avg_loss))
+        print('LOSS of the network on the testing records: {}'.format(avg_loss))
         return avg_loss
 
     def draw(self):
         print('ploting...')
-        plt.figure(figsize=(8, 8))
+        plt.figure(figsize = (16, 8))
+        plt.subplot(1, 2, 1)
         x = range(1, len(self.plot_dict["train_loss"]) + 1)
         plt.xlabel("epoch")
-        plt.plot(x, self.plot_dict["train_loss"], label="train_loss")
-        plt.plot(x, self.plot_dict["test_loss"], label="test_loss")
+        plt.plot(x, self.plot_dict["train_loss"], label = "train_loss")
+        plt.legend()
+
+        plt.subplot(1, 2, 2)
+        x = range(1, len(self.plot_dict["test_loss"]) + 1)
+        plt.xlabel("epoch")
+        plt.plot(x, self.plot_dict["test_loss"], label = "test_loss")
         plt.legend()
 
         plt.tight_layout()
-        plt.savefig(self.PATH['fig_save_path_curve'], bbox_inches='tight', dpi=300)
+        plt.savefig(self.PATH['fig_save_path_curve'], bbox_inches = 'tight', dpi = 300)
 
     def save(self, epoch):
         print('saving...')
@@ -194,7 +182,7 @@ class NetworkTrainer(object):
         for self.EPOCH in range(1, self.NUM_EPOCHS + 1):
             self.train_epoch()
             self.eval_epoch()
-            if self.EPOCH % 5 == 0:
+            if self.EPOCH % 10 == 0:
                 self.draw()
                 self.save(self.EPOCH)
 
